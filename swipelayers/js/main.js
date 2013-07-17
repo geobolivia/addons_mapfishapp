@@ -11,10 +11,10 @@ GEOR.Addons.SwipeLayers = function(map, options) {
 GEOR.Addons.SwipeLayers.prototype = {
     mmap: null,
     mapFront: null,
-    mapBack: null,
     pFront: null,
     pBack: null,
     layers: null,
+    swipe: null,
     
     /**
      * Method: init
@@ -24,16 +24,6 @@ GEOR.Addons.SwipeLayers.prototype = {
      */
     init: function(record) {
         var lang = OpenLayers.Lang.getCode();
-        /*var item = new Ext.menu.CheckItem({
-                text: record.get("title")[lang],
-                qtip: record.get("description")[lang],
-                //iconCls: "addon-magnifier",
-                checked: false,
-                listeners: {
-                    "checkchange": this.onCheckchange,
-                    scope: this
-                }
-            });*/
         this.item = new Ext.menu.Item({
             text: record.get("title")[lang],
             iconCls: 'icon',
@@ -42,14 +32,10 @@ GEOR.Addons.SwipeLayers.prototype = {
             scope: this
         });
         mmap = this.map;
-        mapFront = this.createMap();
-        mapBack = this.createMap();
-        
+        mapFront = this.createMap();        
         pFront = this.createMapPanel('mapFront', mapFront);
-        pBack = this.createMapPanel('mapBack', mapBack);
         
         this.layers = this.getLayers();
-        //this.item = item;
         return this.item;
     },
 
@@ -62,7 +48,7 @@ GEOR.Addons.SwipeLayers.prototype = {
         this.control = null;
         this.map = null;
     },
-    
+     
     showWindow: function(){
         if (!this.win) {
             this.cbx = new Ext.form.Checkbox({
@@ -84,59 +70,8 @@ GEOR.Addons.SwipeLayers.prototype = {
                 items: [this.createForm()]
             },{
                 region: 'center',
-                height: 300,
-                items: [pFront, pBack]
-            },{
-                region: 'south',
-                height: 30,
-                items: [
-                    //new Ext.slider.MultiSlider({
-                    new Ext.Slider({
-                        width: 550,
-                        value: 50,
-                        minValue: 0,
-                        maxValue: 100,
-                        listeners: {
-                            change: function(slider, e) {
-                                // get the slider's thumbs' values
-                                var vals = slider.getValues();
-                                var mapBack = Ext.get('mapBack');
-                                var mapFront = Ext.get('mapFront');
-                                var sizeBack = mapBack.getSize();
-                                
-                                var w = sizeBack.width * vals / 100;
-                                mapFront.setWidth(w);
-                            }
-                        }
-                    })
-                ],
-                margins: '0 0 0 30'
-                }, {
-                    region: 'west',
-                    width: 30,
-                    height: 100,
-                    items: [
-                        new Ext.Slider({
-                            height: 338,
-                            vertical: true,
-                            value: 50,
-                            minValue: 0,
-                            maxValue: 100,
-                            listeners: {
-                                change: function(slider, e) {
-                                    // get the slider's thumbs' values
-                                    var vals = slider.getValues();
-                                    var mapBack = Ext.get('mapBack');
-                                    var mapFront = Ext.get('mapFront');
-                                    var sizeBack = mapBack.getSize();
-                                    var h = sizeBack.height - (sizeBack.height * vals / 100);
-                                    mapFront.setHeight(h);
-                                }
-                            }
-                        })
-                    ],
-                    margins: '0 0 0 0'
-                }]
+                items: [pFront]
+            }]
                 /*buttons: [{
                  text: 'Close',
                  handler: function(){
@@ -201,24 +136,31 @@ GEOR.Addons.SwipeLayers.prototype = {
             emptyText:'Select a layer...',  
             width: 200,
             onSelect: function(record) {
-                var i, newLayer;                
-                if(this.id == "cbboxFront"){
-                    for(i=mapFront.layers.length -1 ; i >= 0 ; i--){
-                        mapFront.removeLayer(mapFront.layers[i]);
-                    }
-                    newLayer = mmap.getLayer(record.data.abbr).clone();
+                var i, newLayer;
+                newLayer = mmap.getLayer(record.data.abbr).clone();
+                
+                if(mapFront.layers.length == 0){
                     newLayer.isBaseLayer=true;
                     mapFront.addLayer(newLayer);
-                    mapFront.zoomToScale(mmap.getScale());
-                } else if(this.id == "cbboxBack") {
-                    for(i=mapBack.layers.length -1 ; i >= 0 ; i--){
-                        mapBack.removeLayer(mapBack.layers[i]);
-                    }
                     newLayer = mmap.getLayer(record.data.abbr).clone();
-                    newLayer.isBaseLayer=true;
-                    mapBack.addLayer(newLayer);
-                    mapBack.zoomToScale(mmap.getScale());
+                    mapFront.addLayer(newLayer);
+                } else {
+                    if(this.id == "cbboxFront"){
+                        mapFront.removeLayer(mapFront.layers[1]);
+                        mapFront.addLayer(newLayer);
+                    } else if(this.id == "cbboxBack") {
+                        swipe.deactivate();
+                        var layer = mapFront.layers[1].clone();
+                        for(i=mapFront.layers.length -1 ; i >= 0 ; i--){
+                            mapFront.removeLayer(mapFront.layers[i]);
+                        }
+                        newLayer.isBaseLayer=true;
+                        mapFront.addLayer(newLayer);
+                        mapFront.addLayer(layer);
+                        swipe.activate();
+                    }
                 }
+                mapFront.zoomToScale(mmap.getScale());
                 this.setValue(record.data.layer);
                 this.collapse();
             }
@@ -232,7 +174,9 @@ GEOR.Addons.SwipeLayers.prototype = {
             units: this.map.units,
             scales: this.map.scales
         });
-        //map.addControl(new OpenLayers.Control.LayerSwitcher());
+        swipe = new OpenLayers.Control.Swipe({map: map});
+        map.addControls([new OpenLayers.Control.LayerSwitcher(),swipe]);
+        swipe.activate();
         return map;
     },
             
@@ -241,7 +185,7 @@ GEOR.Addons.SwipeLayers.prototype = {
             id: id,
             region: "center",
             width: '100%',
-            height: 340,
+            height: 370,
             map: map,
             center: this.map.center,
             zoom: 6
