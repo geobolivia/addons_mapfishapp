@@ -1,3 +1,8 @@
+/* 
+ * Copyright (c) 2013 by GeoBolivia 
+ * Author: Davis Mendoza Paco <davis.men.pa@gmail.com, dmendoza@geo.gob.bo> 
+ *
+ */
 OpenLayers.Control.SwipeLayers = OpenLayers.Class(OpenLayers.Control, {
     CLASS_NAME: 'OpenLayers.Control.Swipelayers',
             

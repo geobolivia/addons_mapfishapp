@@ -1,3 +1,8 @@
+/* 
+ * Copyright (c) 2013 by GeoBolivia 
+ * Author: Davis Mendoza Paco <davis.men.pa@gmail.com, dmendoza@geo.gob.bo> 
+ *
+ */
 Ext.namespace("GEOR.Addons");
 
 GEOR.Addons.SwipeLayers = function(map, options) {
@@ -36,8 +41,8 @@ GEOR.Addons.SwipeLayers.prototype = {
         mapFront = this.createMap();        
         pFront = this.createMapPanel('mapFront', mapFront);
         this.layers = this.getLayers();
-        cbboxFront = this.createComboBox('cbboxFront','Front', this.layers);
-        cbboxBack = this.createComboBox('cbboxBack','Back',this.layers)
+        cbboxFront = this.createComboBox('cbboxFront',OpenLayers.i18n('Bring to Front'), this.layers);
+        cbboxBack = this.createComboBox('cbboxBack',OpenLayers.i18n('Send Backward'),this.layers)
         return this.item;
     },
 
@@ -58,8 +63,9 @@ GEOR.Addons.SwipeLayers.prototype = {
                 boxLabel: OpenLayers.i18n("sync map extent")
             });
             this.win = new Ext.Window({
+                title: OpenLayers.i18n('Swipe Layers'),
                 layout: 'fit',
-                width: 600,
+                width: 650,
                 height: 450,
                 resizable: false,
                 iconCls: 'icon',
@@ -88,7 +94,7 @@ GEOR.Addons.SwipeLayers.prototype = {
 	
     createForm: function() {
         return new Ext.FormPanel({
-            labelWidth: 40, // label settings here cascade unless overridden
+            labelWidth: 80,
             labelAlign: 'left',
             width: '100%',
             frame: true,
@@ -135,12 +141,11 @@ GEOR.Addons.SwipeLayers.prototype = {
             mode: 'local',
             triggerAction: 'all',
             fieldLabel: field,
-            emptyText:'Select a layer...',  
+            emptyText: OpenLayers.i18n('Select a layer'),  
             width: 200,
             onSelect: function(record) {
                 var i, newLayer;
                 newLayer = mmap.getLayer(record.data.abbr).clone();
-                alert(newLayer.projection);
                 if(mapFront.layers.length == 0){
                     newLayer.isBaseLayer=true;
                     mapFront.addLayer(newLayer);
@@ -177,7 +182,7 @@ GEOR.Addons.SwipeLayers.prototype = {
             scales: this.map.scales
         });
         swipe = new OpenLayers.Control.Swipe({map: map});
-        map.addControls([new OpenLayers.Control.LayerSwitcher(),swipe]);
+        map.addControls([swipe]);
         swipe.activate();
         return map;
     },
@@ -198,5 +203,9 @@ GEOR.Addons.SwipeLayers.prototype = {
         var layers = this.getLayers();
         cbboxFront.getStore().loadData(layers);
         cbboxBack.getStore().loadData(layers);
+        if(mapFront.layers.length > 0){
+            mapFront.setCenter(mmap.getCenter());   
+            mapFront.zoomToScale(mmap.getScale());
+        }
     }
 };

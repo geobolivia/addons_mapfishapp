@@ -1,14 +1,25 @@
 {
     "js": [
         "js/OpenLayers.Control.SwipeLayers.js",
-        "js/main.js"
+        "js/main.js",
+        "lib/Swipe.js"
     ],
     "css": [
         "css/main.css"
     ],
     "i18n": {
-        "en": {},
-        "es": {},
+        "en": {
+            "Swipe Layers":"Swipe Layers",
+            "Bring to Front":"Bring to Front",
+            "Send Backward":"Send Backward",
+            "Select a layer":"Select a layer"
+        },
+        "es": {
+            "Swipe Layers":"Swipe Layers",
+            "Bring to Front":"Traer al frente",
+            "Send Backward":"Enviar atrás",
+            "Select a layer":"Seleccione una capa"
+        },
         "fr": {}
     }
 }
