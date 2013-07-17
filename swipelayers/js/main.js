@@ -12,7 +12,8 @@ GEOR.Addons.SwipeLayers.prototype = {
     mmap: null,
     mapFront: null,
     pFront: null,
-    pBack: null,
+    cbboxFront: null,
+    cbboxBack: null,
     layers: null,
     swipe: null,
     
@@ -34,8 +35,9 @@ GEOR.Addons.SwipeLayers.prototype = {
         mmap = this.map;
         mapFront = this.createMap();        
         pFront = this.createMapPanel('mapFront', mapFront);
-        
         this.layers = this.getLayers();
+        cbboxFront = this.createComboBox('cbboxFront','Front', this.layers);
+        cbboxBack = this.createComboBox('cbboxBack','Back',this.layers)
         return this.item;
     },
 
@@ -96,11 +98,11 @@ GEOR.Addons.SwipeLayers.prototype = {
                 items: [{
                     columnWidth: .5,
                     layout: 'form',
-                    items: [this.createComboBox('cbboxFront','Front', this.layers)]
+                    items: [cbboxFront]
                 }, {
                     columnWidth: .5,
                     layout: 'form',
-                    items: [this.createComboBox('cbboxBack','Back',this.layers)]
+                    items: [cbboxBack]
                 }]
             }]
         });
@@ -117,17 +119,17 @@ GEOR.Addons.SwipeLayers.prototype = {
                 layers.push([layer.id,layer.name]);
             }
         }
-
-        return new Ext.data.ArrayStore({
-            fields: ['abbr','layer'],
-            data : layers 
-        });
+        
+        return layers;
     },
             
     createComboBox: function(id, field, store){
         var combo = new Ext.form.ComboBox({
             id: id,
-            store: store,
+            store: new Ext.data.ArrayStore({
+                fields: ['abbr','layer'],
+                data : store 
+            }),
             displayField:'layer',
             editable:false,
             mode: 'local',
@@ -138,7 +140,7 @@ GEOR.Addons.SwipeLayers.prototype = {
             onSelect: function(record) {
                 var i, newLayer;
                 newLayer = mmap.getLayer(record.data.abbr).clone();
-                
+                alert(newLayer.projection);
                 if(mapFront.layers.length == 0){
                     newLayer.isBaseLayer=true;
                     mapFront.addLayer(newLayer);
@@ -192,15 +194,9 @@ GEOR.Addons.SwipeLayers.prototype = {
         });
     },
     
-    removeLayers: function(map){
-        if(map){
-            for(var i=map.layers.length -1 ; i >= 0 ; i--){
-                map.removeLayer(map.layers[i]);
-            }
-        }
-    },
-    
     update: function(){
-       
+        var layers = this.getLayers();
+        cbboxFront.getStore().loadData(layers);
+        cbboxBack.getStore().loadData(layers);
     }
 };
