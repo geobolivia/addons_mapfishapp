@@ -36,16 +36,7 @@ GEOR.Addons.InsertCSV.prototype = {
         this.geojsonFormat = new OpenLayers.Format.GeoJSON();
         
         _insertLayer = new OpenLayers.Layer.Markers("addon_Insert_csv", {
-            displayInLayerSwitcher: false,
-            styleMap: new OpenLayers.StyleMap({
-                "default": {
-                    graphicName: "cross",
-                    pointRadius: 16,
-                    strokeColor: "fuchsia",
-                    strokeWidth: 2,
-                    fillOpacity: 0
-                }
-            })
+            displayInLayerSwitcher: false
         });
         
                
