@@ -1,6 +1,5 @@
 {
     "js": [
-        "js/OpenLayers.Control.SwipeLayers.js",
         "js/main.js",
         "lib/Swipe.js"
     ],
