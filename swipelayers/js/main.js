@@ -176,13 +176,11 @@ GEOR.Addons.SwipeLayers.prototype = {
     },
     
     createMap: function(){
-	var options = {
+        var map = new OpenLayers.Map({
             projection: this.map.projection,
             units: this.map.units,
-            scales: this.map.scales,
-            controls :[
-            new OpenLayers.Control.Navigation()]};
-        var map = new OpenLayers.Map(options);
+            scales: this.map.scales
+        });
         swipe = new OpenLayers.Control.Swipe({map: map});
         map.addControls([swipe]);
         swipe.activate();
