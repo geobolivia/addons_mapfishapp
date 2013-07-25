@@ -399,9 +399,9 @@ OpenLayers.Control.Swipe = OpenLayers.Class(OpenLayers.Control, {
             // slider position in pixels
             var s = parseInt(width * this.getSwipeRatio() * ((this.map.getCurrentSize().w - this.width) / this.map.getCurrentSize().w), 10);
             // cliping rectangle
-            var top = -this.map.layerContainerOriginPx.y;
+            var top = -parseInt(this.map.layerContainerDiv.style.top);
             var bottom = top + height;
-            var left = -this.map.layerContainerOriginPx.x;
+            var left = -parseInt(this.map.layerContainerDiv.style.left);
             var right = left + s + Math.ceil((this.width - 1) / 2);
             //Syntax for clip "rect(top,right,bottom,left)"
             var clip = "rect(" + top + "px " + right + "px " + bottom + "px " + left + "px)";
