@@ -180,6 +180,7 @@ GEOR.Addons.SwipeLayers.prototype = {
             projection: this.map.projection,
             units: this.map.units,
             scales: this.map.scales,
+            theme: null,
             controls :[
             new OpenLayers.Control.Navigation()]};
         var map = new OpenLayers.Map(options);
